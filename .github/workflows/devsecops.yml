@@ -1,0 +1,41 @@
+name: DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install Backend Dependencies
+      run: |
+        cd backend
+        npm install
+
+    - name: Run Gitleaks Scan
+      uses: zricethezav/gitleaks-action@v2
+
+    - name: Run Trivy Scan
+      run: |
+        docker build -t secure-backend ./backend
+        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+        trivy image --exit-code 0 --severity HIGH,CRITICAL secure-backend
+
+    - name: Run SonarQube Scan
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        cd backend
+        npm install -g sonarqube-scanner
+        npx sonar-scanner
+

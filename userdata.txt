@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Update system
+yum update -y
+
+# --------------------------
+# Install Docker
+# --------------------------
+sudo yum install -y docker
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker ec2-user
+
+# --------------------------
+# Install Git
+# --------------------------
+yum install git -y
+
+# --------------------------
+# Install AWS CLI v2
+# --------------------------
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+yum install unzip -y
+unzip awscliv2.zip
+./aws/install
+rm -rf aws awscliv2.zip
+
+# --------------------------
+# Install Node.js (LTS) & npm
+# --------------------------
+curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+yum install -y nodejs
+node -v
+npm -v
+
+# --------------------------
+# Install Terraform
+# --------------------------
+TERRAFORM_VERSION="1.8.5"
+curl -fsSL -o terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+unzip terraform.zip
+mv terraform /usr/local/bin/
+chmod +x /usr/local/bin/terraform
+rm -f terraform.zip
+terraform -v
+
+# Done
+echo "DevSecOps tools installed successfully!"
