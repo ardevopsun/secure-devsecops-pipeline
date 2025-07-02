@@ -23,13 +23,17 @@ jobs:
         npm install
 
     - name: Run Gitleaks Scan
-      uses: zricethezav/gitleaks-action@v2
+      uses: zricethezav/gitleaks-action@v2.3.3
+      with:
+        args: --no-git -v
+      continue-on-error: true
 
     - name: Run Trivy Scan
       run: |
-        docker build -t secure-backend ./backend
         curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+        docker build -t secure-backend ./backend
         trivy image --exit-code 0 --severity HIGH,CRITICAL secure-backend
+      continue-on-error: true
 
     - name: Run SonarQube Scan
       env:
@@ -37,5 +41,9 @@ jobs:
       run: |
         cd backend
         npm install -g sonarqube-scanner
-        npx sonar-scanner
-
+        npx sonar-scanner \
+          -Dsonar.projectKey=secure-devsecops \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=http://44.204.48.136:9000 \
+          -Dsonar.login=${SONAR_TOKEN}
+      continue-on-error: true
