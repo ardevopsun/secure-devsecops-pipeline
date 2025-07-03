@@ -47,3 +47,10 @@ jobs:
           -Dsonar.host.url=http://44.223.35.123:9000 \
           -Dsonar.login=${SONAR_TOKEN}
       continue-on-error: true
+
+    - name: Run Checkov Scan
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: ./terraform
+        quiet: true
+      continue-on-error: true
