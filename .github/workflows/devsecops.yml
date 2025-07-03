@@ -44,7 +44,7 @@ jobs:
         npx sonar-scanner \
           -Dsonar.projectKey=secure-devsecops \
           -Dsonar.sources=. \
-          -Dsonar.host.url=http://44.223.35.123:9000 \
+          -Dsonar.host.url=http://44.208.27.197:9000 \
           -Dsonar.login=${SONAR_TOKEN}
       continue-on-error: true
 
